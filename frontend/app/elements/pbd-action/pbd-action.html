@@ -1,0 +1,30 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+
+<dom-module id="pbd-program">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+    <p><a href="/">Back to program list</a></p>
+    <div>Hello from <span>{{id}}</span></div>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'pbd-program',
+
+      properties: {
+        id: {
+          type: String,
+          value: 'pbd-program',
+          notify: true
+        }
+      }
+    });
+  })();
+  </script>
+</dom-module>

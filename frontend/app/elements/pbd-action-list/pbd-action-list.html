@@ -1,0 +1,163 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../../bower_components/paper-material/paper-material.html">
+<link rel="import" href="../../bower_components/paper-styles/typography.html">
+<link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
+<link rel="import" href="../../bower_components/ros-ros/ros-ros.html">
+<link rel="import" href="../../bower_components/ros-service/ros-service.html">
+<link rel="import" href="../../styles/shared-styles.html">
+
+<dom-module id="pbd-program-list">
+  <template>
+    <style include="shared-styles"></style>
+    <style>
+      :host {
+        display: block;
+      }
+      paper-button.delete {
+        color: #D32F2F;
+      }
+      #confirmDeleteDialog h1 {
+        @apply(--paper-font-title);
+      }
+      .msgList {
+        border-spacing: 0;
+        width: 100%;
+      }
+      .msgList th, td {
+        border-bottom: 1px solid var(--divider-color);
+        padding: 5px 10px;
+      }
+      .msgList th {
+        text-align: left;
+        padding: 15px;
+      }
+      .msgList tr:last-child td {
+        border-bottom: none;
+      }
+    </style>
+    <ros-ros ros="{{ros}}" on-connection="_onRosConnected"></ros-ros>
+    <ros-service
+      id="listService"
+      on-fail="_onListError"
+      on-response="_onResponse"
+      name="/mongo_msg_db/list"
+      ros="{{ros}}"
+      service-type="mongo_msg_db_msgs/List"
+    ></ros-service>
+    <ros-service
+      id="deleteService"
+      on-fail="_onDeleteError"
+      name="/mongo_msg_db/delete"
+      ros="{{ros}}"
+      service-type="mongo_msg_db_msgs/Delete"
+    ></ros-service>
+    <paper-material>
+    <table class="msgList">
+      <tr><th>Action name</th><th></th></tr>
+      <template is="dom-repeat" items="{{messages}}">
+        <tr>
+          <td>{{item.action.name}}</td>
+          <td>
+            <paper-button class="link" data-action-id$="{{item.id}}" on-tap="_onRun">Run</paper-button>
+            <paper-button class="delete link" data-action-id$="{{item.id}}" on-tap="_onMaybeDelete">Delete</paper-button>
+          </td>
+        </tr>
+      </template>
+    </table>
+    </paper-material>
+    <paper-dialog id="confirmDeleteDialog" modal>
+      <h1>Delete action?</h1>
+      <div class="buttons">
+        <paper-button dialog-dismiss>Cancel</paper-button>
+        <paper-button dialog-confirm on-tap="_onDelete">Delete</paper-button>
+      </div>
+    </paper-dialog>
+    <paper-toast id="toast"></paper-toast>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'pbd-program-list',
+
+      properties: {
+        messages: {
+          type: Array,
+          value: []
+        },
+        programs: {
+          type: Object,
+        },
+        ros: Object,
+        routeData: {
+          type: Object,
+          notify: true,
+        },
+        _programToDelete: String,
+      },
+
+      _onMaybeDelete: function(evt) {
+        this._programToDelete = evt.srcElement.dataset.actionId;
+        this.$.confirmDeleteDialog.open();
+      },
+
+      _onDelete: function() {
+        var msg = {
+          collection: {
+            db: 'pr2_pbd',
+            collection: 'actions'
+          },
+          id: this._programToDelete
+        };
+        this.$.deleteService.call(msg);
+        this._updateActionList();
+      },
+
+      _onRun: function(evt) {
+        alert('Not implemented yet.');
+        //this.set('routeData.id', evt.srcElement.dataset.actionId);
+      },
+
+      _onResponse: function(evt) {
+        this.messages = [];
+        var messages = evt.detail.messages;
+        for (var i = 0; i < messages.length; ++i) {
+          var msg = messages[i];
+          var id = msg.id;
+          var action = JSON.parse(msg.json);
+          this.push('messages', {id: id, action: action});
+        }
+      },
+
+      _onRosConnected: function() {
+        this._updateActionList();
+      },
+
+      _updateActionList: function() {
+        var msg = {
+          collection: {
+            db: 'pr2_pbd',
+            collection: 'actions'
+          }
+        };
+        this.$.listService.call(msg);
+      },
+
+      _onListError: function(err) {
+        console.error(err);
+        this.$.toast.text = 'Failed to load action list.';
+        this.$.toast.show();
+      },
+
+      _onDeleteError: function(err) {
+        console.error(err);
+        this.$.toast.text = 'Failed to delete action: ';
+        this.$.toast.show();
+      },
+    });
+  })();
+  </script>
+</dom-module>
