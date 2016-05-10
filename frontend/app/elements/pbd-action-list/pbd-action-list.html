@@ -8,7 +8,7 @@
 <link rel="import" href="../../bower_components/ros-service/ros-service.html">
 <link rel="import" href="../../styles/shared-styles.html">
 
-<dom-module id="pbd-program-list">
+<dom-module id="pbd-action-list">
   <template>
     <style include="shared-styles"></style>
     <style>
@@ -60,7 +60,7 @@
         <tr>
           <td>{{item.action.name}}</td>
           <td>
-            <paper-button class="link" data-action-id$="{{item.id}}" on-tap="_onRun">Run</paper-button>
+            <paper-button class="link" data-action-id$="{{item.id}}" on-tap="_onOpen">Open</paper-button>
             <paper-button class="delete link" data-action-id$="{{item.id}}" on-tap="_onMaybeDelete">Delete</paper-button>
           </td>
         </tr>
@@ -81,7 +81,7 @@
     'use strict';
 
     Polymer({
-      is: 'pbd-program-list',
+      is: 'pbd-action-list',
 
       properties: {
         messages: {
@@ -116,9 +116,8 @@
         this._updateActionList();
       },
 
-      _onRun: function(evt) {
-        alert('Not implemented yet.');
-        //this.set('routeData.id', evt.srcElement.dataset.actionId);
+      _onOpen: function(evt) {
+        this.set('routeData.id', evt.srcElement.dataset.actionId);
       },
 
       _onResponse: function(evt) {

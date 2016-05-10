@@ -17,9 +17,9 @@
     <iron-pages selected="{{selectedRoute}}">
     <div>
       <h1>PR2 Programming by Demonstration</h1>
-      <pbd-program-list route-data="{{data}}"></pbd-program-list>
+      <pbd-action-list id="actionList" route-data="{{data}}"></pbd-action-list>
     </div>
-    <div><pbd-program id="{{data.id}}"></pbd-program></div>
+    <div><pbd-action id="{{data.id}}" route-data="{{data}}"></pbd-action></div>
     </iron-pages>
   </template>
   <script>
@@ -51,6 +51,7 @@
           this.selectedRoute = 1;
         } else {
           this.selectedRoute = 0;
+          this.$.actionList._updateActionList();
         }
       }
     });
