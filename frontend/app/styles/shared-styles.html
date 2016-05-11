@@ -4,8 +4,17 @@
     <style>
       paper-button {
         @apply(--paper-font-button);
+        border-radius: 2px;
         letter-spacing: 0;
         line-height: 1;
+      }
+      paper-button iron-icon {
+        --iron-icon-height: 18px;
+        --iron-icon-width: 18px;
+      }
+      paper-button span {
+        position: relative;
+        top: 1px;
       }
       paper-button.link {
         color: rgba(0, 0, 0, 0.87);
