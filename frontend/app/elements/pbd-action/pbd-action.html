@@ -1,8 +1,11 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/iron-icon/iron-icon.html">
 <link rel="import" href="../../bower_components/iron-icons/iron-icons.html">
+<link rel="import" href="../../bower_components/iron-icons/av-icons.html">
+<link rel="import" href="../../../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../../bower_components/paper-styles/color.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/ros-ros/ros-ros.html">
@@ -12,9 +15,24 @@
 <dom-module id="pbd-action">
   <template>
     <style include="shared-styles"></style>
+    <style include="iron-flex"></style>
     <style>
       :host {
         display: block;
+      }
+      #backButton:hover {
+        background-color: var(--paper-grey-300);
+      }
+      #nameInput {
+        max-width: 500px;
+        position: relative;
+        top: -11px;
+      }
+      #executeButton {
+        color: rgba(255, 255, 255, 1);
+        background-color: var(--paper-green-500);
+        margin-left: 10px;
+        margin-bottom: 13px;
       }
     </style>
     <ros-ros ros="{{ros}}" on-connection="_onRosConnected"></ros-ros>
@@ -33,17 +51,31 @@
       ros="{{ros}}"
       service-type="mongo_msg_db_msgs/Update"
     ></ros-service>
-    <paper-button on-tap="_goToList">
+    <ros-service
+      id="executeService"
+      on-fail="_onExecuteError"
+      name="/execute_action"
+      ros="{{ros}}"
+      service-type="pr2_pbd_interaction/ExecuteActionById"
+    ></ros-service>
+    <paper-button id="backButton" on-tap="_goToList">
       <iron-icon icon="arrow-back"></iron-icon>
-      Back to program list
+      <span>Back to program list</span>
     </paper-button>
-    <div>
+    <div id="header" class="center layout horizontal">
       <paper-input
+        class="flex"
         id="nameInput"
         label="Action name"
         value="{{action.name}}"
         on-change="_onNameChange"
       ></paper-input>
+      <paper-button raised id="executeButton" on-tap="_onExecute">
+        <iron-icon icon="av:play-arrow"></iron-icon>
+        <span>Execute</span>
+      </paper-button>
+    </div>
+    <div id="viz">
     </div>
     <paper-toast id="toast" duration="0">
       <paper-button on-tap="_closeToast">Dismiss</paper-button>
@@ -85,8 +117,21 @@
         this.set('routeData.id', '');
       },
 
-      _onFindError: function() {
-        console.error('Error looking up ID: ' + this.id);
+      _onExecute: function() {
+        var msg = {
+          action_id: this.id,
+        };
+        this.$.executeService.call(msg);
+      },
+
+      _onExecuteError: function(evt) {
+        console.error(evt.detail);
+        this.$.toast.text = 'Failed to execute action.';
+        this.$.toast.show();
+      },
+
+      _onFindError: function(evt) {
+        console.error('Error looking up ID: ' + this.id, evt.detail);
         this.$.toast.text = 'Failed to load action.';
         this.$.toast.show();
       },
@@ -121,7 +166,7 @@
       },
 
       _onResponse: function(evt) {
-        if (evt.detail.matched_count != 1) {
+        if (evt.detail.matched_count !== 1) {
           this._onFindError();
         }
         this.action = JSON.parse(evt.detail.message.json);
@@ -131,7 +176,8 @@
         this.isRosConnected = true;
       },
 
-      _onUpdateError: function() {
+      _onUpdateError: function(evt) {
+        console.error(evt.detail);
         this.$.toast.text = 'Failed to save action to the database.';
         this.$.toast.show();
       },
