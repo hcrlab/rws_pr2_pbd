@@ -37,7 +37,6 @@
         border-bottom: none;
       }
     </style>
-    <ros-ros ros="{{ros}}" on-connection="_onRosConnected"></ros-ros>
     <ros-service
       id="listService"
       on-fail="_onListError"
@@ -129,10 +128,6 @@
           var action = JSON.parse(msg.json);
           this.push('messages', {id: id, action: action});
         }
-      },
-
-      _onRosConnected: function() {
-        this._updateActionList();
       },
 
       _updateActionList: function() {

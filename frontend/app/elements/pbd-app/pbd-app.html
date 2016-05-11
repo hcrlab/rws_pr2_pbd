@@ -14,12 +14,13 @@
     </style>
     <carbon-location route="{{route}}"></carbon-location>
     <carbon-route route="{{route}}" pattern="/:id" data="{{data}}"></carbon-route>
+    <ros-ros ros="{{ros}}"></ros-ros>
     <iron-pages selected="{{selectedRoute}}">
     <div>
       <h1>PR2 Programming by Demonstration</h1>
-      <pbd-action-list id="actionList" route-data="{{data}}"></pbd-action-list>
+      <pbd-action-list id="actionList" ros="{{ros}}" route-data="{{data}}"></pbd-action-list>
     </div>
-    <div><pbd-action id="{{data.id}}" route-data="{{data}}"></pbd-action></div>
+    <div><pbd-action id="{{data.id}}" ros="{{ros}}" route-data="{{data}}"></pbd-action></div>
     </iron-pages>
   </template>
   <script>
@@ -40,6 +41,7 @@
         data: {
           type: Object,
         },
+        ros: Object,
       },
 
       observers: [
@@ -53,7 +55,7 @@
           this.selectedRoute = 0;
           this.$.actionList._updateActionList();
         }
-      }
+      },
     });
   })();
   </script>
