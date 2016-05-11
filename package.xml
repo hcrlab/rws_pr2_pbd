@@ -48,6 +48,6 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <appname>Programming by Demonstration</appname>
+    <appname>PbD actions</appname>
   </export>
 </package>
