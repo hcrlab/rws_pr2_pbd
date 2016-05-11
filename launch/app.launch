@@ -1,0 +1,3 @@
+<launch>
+  <include file="$(find pr2_pbd_interaction)/launch/pbd_backend.launch" />
+</launch>
