@@ -9,14 +9,16 @@
     "platinum-elements": "PolymerElements/platinum-elements#^1.1.0",
     "polymer": "Polymer/polymer#^1.2.0",
     "paper-menu": "PolymerElements/paper-menu#4fecb43601",
-    "carbon-route": "PolymerElements/carbon-route#^0.8.4",
-    "ros-service": "jstnhuang/ros-service#^1.0.0"
+    "app-route": "PolymerElements/app-route#^0.9.1",
+    "ros-service": "jstnhuang/ros-service#^1.0.0",
+    "ros-rviz": "jstnhuang/ros-rviz#^0.6.0"
   },
   "devDependencies": {
     "web-component-tester": "*"
   },
   "ignore": [],
   "resolutions": {
-    "paper-menu": "4fecb43601"
+    "paper-menu": "^1.2.2",
+    "ros-rviz": "^0.5.2"
   }
 }

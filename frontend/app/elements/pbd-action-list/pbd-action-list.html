@@ -4,7 +4,6 @@
 <link rel="import" href="../../bower_components/paper-material/paper-material.html">
 <link rel="import" href="../../bower_components/paper-styles/typography.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../../bower_components/ros-ros/ros-ros.html">
 <link rel="import" href="../../bower_components/ros-service/ros-service.html">
 <link rel="import" href="../../styles/shared-styles.html">
 
@@ -96,6 +95,10 @@
           notify: true,
         },
         _programToDelete: String,
+      },
+
+      onRosConnected: function() {
+        this._updateActionList();
       },
 
       _onMaybeDelete: function(evt) {

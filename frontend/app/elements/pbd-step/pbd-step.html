@@ -1,0 +1,38 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+
+<dom-module id="pbd-step">
+  <template>
+    <style>
+      :host {
+        display: block;
+      }
+
+      paper-button {
+        background-color: var(--paper-grey-200);
+        min-width: 1em;
+      }
+      paper-button:hover {
+        background-color: var(--paper-grey-300);
+      }
+    </style>
+    <paper-button noink>{{_computeStepNum(index)}}</paper-button>
+  </template>
+  <script>
+  (function() {
+    'use strict';
+
+    Polymer({
+      is: 'pbd-step',
+
+      properties: {
+        index: Number,
+      },
+
+      _computeStepNum: function(index) {
+        return index + 1;
+      },
+    });
+  })();
+  </script>
+</dom-module>

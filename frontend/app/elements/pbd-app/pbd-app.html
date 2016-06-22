@@ -1,6 +1,6 @@
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/carbon-route/carbon-location.html">
-<link rel="import" href="../../bower_components/carbon-route/carbon-route.html">
+<link rel="import" href="../../bower_components/app-route/app-location.html">
+<link rel="import" href="../../bower_components/app-route/app-route.html">
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../pbd-action/pbd-action.html">
 <link rel="import" href="../pbd-action-list/pbd-action-list.html">
@@ -10,16 +10,20 @@
     <style>
       :host {
         display: block;
+        height: 100%
+      }
+      iron-pages, iron-pages>div {
+        height: 100%;
       }
     </style>
-    <carbon-location route="{{route}}"></carbon-location>
-    <carbon-route route="{{route}}" pattern="/:id" data="{{data}}"></carbon-route>
-    <ros-ros ros="{{ros}}"></ros-ros>
+    <app-location route="{{route}}"></app-location>
+    <app-route route="{{route}}" pattern="/:id" data="{{data}}"></app-route>
+    <ros-websocket id="ros" url="ws://c1:9090" ros="{{ros}}" on-connection="_onRosConnection" on-error="_onRosError"></ros-websocket>
     <iron-pages selected="{{selectedRoute}}">
-    <div>
-      <pbd-action-list id="actionList" ros="{{ros}}" route-data="{{data}}"></pbd-action-list>
-    </div>
-    <div><pbd-action id="{{data.id}}" ros="{{ros}}" route-data="{{data}}"></pbd-action></div>
+      <div>
+        <pbd-action-list id="actionList" ros="{{ros}}" route-data="{{data}}"></pbd-action-list>
+      </div>
+      <div><pbd-action id="action" action-id="{{data.id}}" ros="{{ros}}" route-data="{{data}}"></pbd-action></div>
     </iron-pages>
   </template>
   <script>
@@ -47,13 +51,30 @@
         '_onIdChanged(data.id)'
       ],
 
+      ready: function() {
+        this.$.ros.connect();
+      },
+
       _onIdChanged: function() {
         if (this.data.id) {
           this.selectedRoute = 1;
+          this.$.action.reset();
         } else {
           this.selectedRoute = 0;
-          this.$.actionList._updateActionList();
+          if (this.ros && this.ros.isConnected) {
+            this.$.actionList._updateActionList();
+          }
         }
+      },
+
+      _onRosConnection: function() {
+        console.log('Connected to websocket server.');
+        this.$.actionList.onRosConnected();
+        this.$.action.onRosConnected();
+      },
+
+      _onRosError: function(e) {
+        console.log('Failed to connect to websocket server:', e);
       },
     });
   })();
