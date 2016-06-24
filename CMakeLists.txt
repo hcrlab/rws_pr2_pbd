@@ -5,13 +5,18 @@ project(rws_pr2_pbd)
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  kdl_parser
+  message_generation
+  mongo_msg_db_msgs
+  rapid_pr2
+  robot_state_publisher
   roscpp
   rospy
 )
+find_package(orocos_kdl REQUIRED)
 
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
-
 
 ## Uncomment this if the package has a setup.py. This macro ensures
 ## modules and global scripts declared therein get installed
@@ -50,11 +55,10 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate services in the 'srv' folder
-# add_service_files(
-#   FILES
-#   Service1.srv
-#   Service2.srv
-# )
+add_service_files(
+  FILES
+  PublishRobotState.srv
+)
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -64,10 +68,9 @@ find_package(catkin REQUIRED COMPONENTS
 # )
 
 ## Generate added messages and services with any dependencies listed here
-# generate_messages(
-#   DEPENDENCIES
-#   std_msgs  # Or other packages containing msgs
-# )
+generate_messages(
+  DEPENDENCIES
+)
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -99,10 +102,17 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-#  INCLUDE_DIRS include
-#  LIBRARIES rws_pr2_pbd
-#  CATKIN_DEPENDS roscpp rospy
-#  DEPENDS system_lib
+  INCLUDE_DIRS include
+  LIBRARIES state_server
+  CATKIN_DEPENDS
+    kdl_parser
+    message_runtime
+    mongo_msg_db_msgs
+    rapid_pr2
+    robot_state_publisher
+    roscpp
+    rospy
+  DEPENDS orocos_kdl
 )
 
 ###########
@@ -113,30 +123,38 @@ catkin_package(
 ## Your package locations should be listed before other locations
 # include_directories(include)
 include_directories(
+  include
   ${catkin_INCLUDE_DIRS}
+  ${orocos_kdl_INCLUDE_DIRS}
+)
+link_directories(${orocos_kdl_LIBRARY_DIRS})
+
+add_library(state_server
+  src/state_server.cpp
+)
+add_dependencies(state_server
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(state_server
+  ${catkin_LIBRARIES}
 )
 
-## Declare a C++ library
-# add_library(rws_pr2_pbd
-#   src/${PROJECT_NAME}/rws_pr2_pbd.cpp
-# )
-
-## Add cmake target dependencies of the library
-## as an example, code may need to be generated before libraries
-## either from message generation or dynamic reconfigure
-# add_dependencies(rws_pr2_pbd ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-## Declare a C++ executable
-# add_executable(rws_pr2_pbd_node src/rws_pr2_pbd_node.cpp)
+add_executable(state_server_node src/state_server_node.cpp)
+add_dependencies(state_server_node
+  state_server
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(state_server_node
+  state_server
+  ${catkin_LIBRARIES}
+)
 
 ## Add cmake target dependencies of the executable
 ## same as for the library above
 # add_dependencies(rws_pr2_pbd_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-## Specify libraries to link a library or executable target against
-# target_link_libraries(rws_pr2_pbd_node
-#   ${catkin_LIBRARIES}
-# )
 
 #############
 ## Install ##
