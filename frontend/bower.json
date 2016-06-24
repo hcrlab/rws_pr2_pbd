@@ -11,14 +11,13 @@
     "paper-menu": "PolymerElements/paper-menu#4fecb43601",
     "app-route": "PolymerElements/app-route#^0.9.1",
     "ros-service": "jstnhuang/ros-service#^1.0.0",
-    "ros-rviz": "jstnhuang/ros-rviz#^0.6.0"
+    "ros-rviz": "jstnhuang/ros-rviz#^0.7.0"
   },
   "devDependencies": {
     "web-component-tester": "*"
   },
   "ignore": [],
   "resolutions": {
-    "paper-menu": "^1.2.2",
-    "ros-rviz": "^0.5.2"
+    "paper-menu": "^1.2.2"
   }
 }

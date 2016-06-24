@@ -239,8 +239,7 @@
         }
         var config = {
           globalOptions: {
-            url: 'ws://c1:9090',
-            colladaServer: 'http://c1:8001/',
+            fixedFrame: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep + '/base_link',
           },
           displays: [
             {
@@ -258,6 +257,7 @@
               type: 'urdf',
               options: {
                 param: 'robot_description',
+                tfPrefix: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep,
               },
             },
           ],

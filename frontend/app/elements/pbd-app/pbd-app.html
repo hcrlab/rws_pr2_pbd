@@ -18,7 +18,7 @@
     </style>
     <app-location route="{{route}}"></app-location>
     <app-route route="{{route}}" pattern="/:id" data="{{data}}"></app-route>
-    <ros-websocket id="ros" url="ws://c1:9090" ros="{{ros}}" on-connection="_onRosConnection" on-error="_onRosError"></ros-websocket>
+    <ros-websocket id="ros" ros="{{ros}}" on-connection="_onRosConnection" on-error="_onRosError"></ros-websocket>
     <iron-pages selected="{{selectedRoute}}">
       <div>
         <pbd-action-list id="actionList" ros="{{ros}}" route-data="{{data}}"></pbd-action-list>
