@@ -49,6 +49,9 @@ bool StateServer::ServeAdd(rws_pr2_pbd::PublishRobotState::Request& req,
 }
 
 bool StateServer::AddAction(const std::string& action_id) {
+  if (states_.find(action_id) != states_.end()) {
+    return true;
+  }
   FindRequest req;
   req.collection.db = "pr2_pbd";
   req.collection.collection = "actions";
@@ -67,6 +70,7 @@ bool StateServer::AddAction(const std::string& action_id) {
     return false;
   }
   const rapidjson::Value& seq = doc["sequence"]["seq"];
+  std::vector<RobotState> states;
   for (size_t i = 0; i < seq.Size(); ++i) {
     JointStates joints;
     const rapidjson::Value& step = seq[i];
@@ -78,8 +82,9 @@ bool StateServer::AddAction(const std::string& action_id) {
     ROS_INFO("Publishing robot state to TF prefix: %s",
              tf_prefix.str().c_str());
     RobotState state(joints, tf_prefix.str());
-    states_.push_back(state);
+    states.push_back(state);
   }
+  states_[action_id] = states;
 
   return true;
 }
