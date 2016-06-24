@@ -1,3 +1,4 @@
 <launch>
   <include file="$(find pr2_pbd_interaction)/launch/pbd_backend.launch" />
+  <node pkg="rws_pr2_pbd" type="state_server_node" name="pr2_pbd_state_server" />
 </launch>

@@ -78,6 +78,13 @@
       ros="{{ros}}"
       service-type="pr2_pbd_interaction/ExecuteActionById"
     ></ros-service>
+    <ros-service
+      id="stateService"
+      on-fail="_onPublishStateError"
+      name="/publish_pbd_state"
+      ros="{{ros}}"
+      service-type="rws_pr2_pbd/PublishRobotState"
+    ></ros-service>
     <div id="container" class="layout vertical">
       <div>
       <paper-button id="backButton" on-tap="_goToList">
@@ -144,6 +151,7 @@
       },
 
       observers: [
+        '_actionIdChanged(_rosConnected, actionId)',
         '_onFindPrereqs(ros, actionId)',
       ],
 
@@ -154,6 +162,12 @@
 
       reset: function() {
         this.selectedStep = 0;
+      },
+
+      _actionIdChanged: function(_rosConnected, actionId) {
+        if (_rosConnected && actionId) {
+          this.$.stateService.call({action_id: this.actionId});
+        }
       },
 
       _closeToast: function() {
@@ -212,6 +226,12 @@
         this.$.updateService.call(msg);
       },
 
+      _onPublishStateError: function(evt) {
+        console.error(evt.detail);
+        this.$.toast.text = 'Failed to get action steps.';
+        this.$.toast.show();
+      },
+
       _onResponse: function(evt) {
         if (evt.detail.matched_count !== 1) {
           this._onFindError();
@@ -219,7 +239,7 @@
         this.action = JSON.parse(evt.detail.message.json);
       },
 
-      _onRosChanged: function(ros) {
+      _onRosChanged: function() {
         this._selectedStepChanged();
       },
 
