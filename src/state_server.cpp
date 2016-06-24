@@ -94,7 +94,7 @@ void StateServer::Publish() {
            states_.begin();
        it != states_.end(); ++it) {
     const std::vector<RobotState>& states = it->second;
-    for (size_t i = 0; i < states_.size(); ++i) {
+    for (size_t i = 0; i < states.size(); ++i) {
       const RobotState& state = states[i];
       pub_->publishFixedTransforms(state.second);
       pub_->publishTransforms(state.first.joint_positions(), ros::Time::now(),
