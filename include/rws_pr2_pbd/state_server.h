@@ -54,7 +54,8 @@ class StateServer {
   urdf::Model model_;
   KDL::Tree tree_;
   robot_state_publisher::RobotStatePublisher* pub_;
-  std::vector<RobotState> states_;
+  std::map<std::string, std::vector<RobotState> >
+      states_;  // Maps action IDs to states to publish
   ros::ServiceClient find_;
 };
 }  // namespace pr2_pbd
