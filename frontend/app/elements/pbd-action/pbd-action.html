@@ -161,12 +161,16 @@
       ],
 
       ready: function() {
-        var that = this;
-        window.addEventListener('unload', function() {
-          that.$.stopStateService.call({
-            client_id: that.clientId,
-          });
-        });
+        // TODO(jstn): MoveIt freaks out when you remove frames, printing out
+        // gigabytes of warnings about the frames being missing. Need to fix
+        // this somehow. For now, we never unsubscribe and assume the programs
+        // are short-lived.
+        //var that = this;
+        //window.addEventListener('unload', function() {
+        //  that.$.stopStateService.call({
+        //    client_id: that.clientId,
+        //  });
+        //});
       },
 
       onRosConnected: function() {
