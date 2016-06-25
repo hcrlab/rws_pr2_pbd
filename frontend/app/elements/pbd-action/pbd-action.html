@@ -79,11 +79,18 @@
       service-type="pr2_pbd_interaction/ExecuteActionById"
     ></ros-service>
     <ros-service
-      id="stateService"
-      on-fail="_onPublishStateError"
-      name="/publish_pbd_state"
+      id="startStateService"
+      on-fail="_onStartStateError"
+      name="/subscribe_pbd_state"
       ros="{{ros}}"
       service-type="rws_pr2_pbd/PublishRobotState"
+    ></ros-service>
+    <ros-service
+      id="stopStateService"
+      on-fail="_onStopStateError"
+      name="/unsubscribe_pbd_state"
+      ros="{{ros}}"
+      service-type="rws_pr2_pbd/StopRobotState"
     ></ros-service>
     <div id="container" class="layout vertical">
       <div>
@@ -114,7 +121,7 @@
         </iron-selector>
       </div>
       <div id="viz" class="flex">
-        <ros-rviz id="rviz" ros="{{ros}}"></ros-rviz>
+        <ros-rviz id="rviz" global-options="{{globalOptions}}" ros="{{ros}}"></ros-rviz>
       </div>
     </div>
     <paper-toast id="toast" duration="0">
@@ -134,40 +141,44 @@
           type: String,
           notify: true
         },
+        clientId: String,
+        globalOptions: Object,
         routeData: {
           type: Object,
           notify: true,
         },
         ros: Object,
         selectedStep: {
-          observer: '_selectedStepChanged',
           type: Number,
           value: 0,
-        },
-        _rosConnected: {
-          type: Boolean,
-          value: false
         },
       },
 
       observers: [
-        '_actionIdChanged(_rosConnected, actionId)',
+        '_updateState(clientId, actionId, selectedStep)',
         '_onFindPrereqs(ros, actionId)',
+        '_clientIdChanged(globalOptions.clientId)',
       ],
 
+      ready: function() {
+        var that = this;
+        window.addEventListener('unload', function() {
+          that.$.stopStateService.call({
+            client_id: that.clientId,
+          });
+        });
+      },
+
       onRosConnected: function() {
-        this._rosConnected = true;
-        this._update();
       },
 
       reset: function() {
         this.selectedStep = 0;
       },
 
-      _actionIdChanged: function(_rosConnected, actionId) {
-        if (_rosConnected && actionId) {
-          this.$.stateService.call({action_id: this.actionId});
-        }
+
+      _clientIdChanged: function(clientId) {
+        this.clientId = clientId;
       },
 
       _closeToast: function() {
@@ -226,7 +237,7 @@
         this.$.updateService.call(msg);
       },
 
-      _onPublishStateError: function(evt) {
+      _onStartStateError: function(evt) {
         console.error(evt.detail);
         this.$.toast.text = 'Failed to get action steps.';
         this.$.toast.show();
@@ -249,17 +260,27 @@
         this.$.toast.show();
       },
 
-      _selectedStepChanged: function() {
-        this._update();
+      _onStopStateError: function(evt) {
+        console.error(evt.detail);
+        this.$.toast.text = 'Failed to unsubscribe client from robot state.';
+        this.$.toast.show();
+      },
+
+      _updateState: function(clientId, actionId, selectedStep) {
+        if (clientId && actionId && (selectedStep === 0 || selectedStep)) {
+          this.$.startStateService.call({
+            client_id: this.clientId,
+            action_id: this.actionId,
+            step_num: this.selectedStep,
+          });
+          this._update();
+        }
       },
 
       _update: function() {
-        if (!(this.ros && this.ros.isConnected)) {
-          return;
-        }
         var config = {
           globalOptions: {
-            fixedFrame: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep + '/base_link',
+            fixedFrame: '/pr2_pbd/' + this.clientId + '/base_link',
           },
           displays: [
             {
@@ -277,7 +298,7 @@
               type: 'urdf',
               options: {
                 param: 'robot_description',
-                tfPrefix: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep,
+                tfPrefix: '/pr2_pbd/' + this.clientId,
               },
             },
           ],

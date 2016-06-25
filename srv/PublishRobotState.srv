@@ -1,3 +1,6 @@
+string client_id # Unique ID for the client
 string action_id # MongoDB ObjectId of the action
+int32 step_num # Step number to get the state for
 ---
+string tf_prefix # The TF prefix the client should use to see the robot.
 string error # Empty string if no error

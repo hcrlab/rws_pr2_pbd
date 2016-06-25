@@ -9,6 +9,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
   mongo_msg_db_msgs
   rapid_pr2
+  rapid_ros
   robot_state_publisher
   roscpp
   rospy
@@ -58,6 +59,7 @@ find_package(orocos_kdl REQUIRED)
 add_service_files(
   FILES
   PublishRobotState.srv
+  StopRobotState.srv
 )
 
 ## Generate actions in the 'action' folder
@@ -109,6 +111,7 @@ catkin_package(
     message_runtime
     mongo_msg_db_msgs
     rapid_pr2
+    rapid_ros
     robot_state_publisher
     roscpp
     rospy

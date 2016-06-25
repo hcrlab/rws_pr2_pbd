@@ -45,6 +45,7 @@
   <build_depend>mongo_msg_db_msgs</build_depend>
   <build_depend>orocos_kdl</build_depend>
   <build_depend>rapid_pr2</build_depend>
+  <build_depend>rapid_ros</build_depend>
   <build_depend>robot_state_publisher</build_depend>
   <build_depend>roscpp</build_depend>
   <build_depend>rospy</build_depend>
@@ -53,6 +54,7 @@
   <run_depend>mongo_msg_db_msgs</run_depend>
   <run_depend>orocos_kdl</run_depend>
   <run_depend>rapid_pr2</run_depend>
+  <run_depend>rapid_ros</run_depend>
   <run_depend>robot_state_publisher</run_depend>
   <run_depend>roscpp</run_depend>
   <run_depend>rospy</run_depend>
