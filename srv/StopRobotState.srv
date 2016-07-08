@@ -1,3 +1,0 @@
-string client_id # The client ID to stop serving the robot state for
----
-string error # Empty string for no error
