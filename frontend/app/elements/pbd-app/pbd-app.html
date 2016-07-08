@@ -16,7 +16,7 @@
         height: 100%;
       }
     </style>
-    <app-location route="{{route}}"></app-location>
+    <app-location route="{{route}}" use-hash-as-path></app-location>
     <app-route route="{{route}}" pattern="/:id" data="{{data}}"></app-route>
     <ros-websocket id="ros" ros="{{ros}}" on-connection="_onRosConnection" on-error="_onRosError"></ros-websocket>
     <iron-pages selected="{{selectedRoute}}">

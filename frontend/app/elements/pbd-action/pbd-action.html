@@ -85,13 +85,13 @@
       ros="{{ros}}"
       service-type="rws_pr2_pbd/PublishRobotState"
     ></ros-service>
-    <ros-service
+    <!--ros-service
       id="stopStateService"
       on-fail="_onStopStateError"
       name="/unsubscribe_pbd_state"
       ros="{{ros}}"
       service-type="rws_pr2_pbd/StopRobotState"
-    ></ros-service>
+    ></ros-service-->
     <div id="container" class="layout vertical">
       <div>
       <paper-button id="backButton" on-tap="_goToList">
@@ -161,12 +161,16 @@
       ],
 
       ready: function() {
-        var that = this;
-        window.addEventListener('unload', function() {
-          that.$.stopStateService.call({
-            client_id: that.clientId,
-          });
-        });
+        // TODO(jstn): MoveIt freaks out when you remove frames, printing out
+        // gigabytes of warnings about the frames being missing. Need to fix
+        // this somehow. For now, we never unsubscribe and assume the programs
+        // are short-lived.
+        //var that = this;
+        //window.addEventListener('unload', function() {
+        //  that.$.stopStateService.call({
+        //    client_id: that.clientId,
+        //  });
+        //});
       },
 
       onRosConnected: function() {
