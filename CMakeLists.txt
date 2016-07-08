@@ -59,7 +59,6 @@ find_package(orocos_kdl REQUIRED)
 add_service_files(
   FILES
   PublishRobotState.srv
-  StopRobotState.srv
 )
 
 ## Generate actions in the 'action' folder
