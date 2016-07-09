@@ -11,7 +11,6 @@
 #include "robot_state_publisher/robot_state_publisher.h"
 #include "ros/ros.h"
 #include "rws_pr2_pbd/PublishRobotState.h"
-#include "rws_pr2_pbd/StopRobotState.h"
 
 using mongo_msg_db_msgs::Find;
 using mongo_msg_db_msgs::FindRequest;
@@ -20,39 +19,41 @@ using rapid::pr2::JointStates;
 using rapid_ros::ServiceClientInterface;
 using robot_state_publisher::RobotStatePublisher;
 using rws_pr2_pbd::PublishRobotState;
-using rws_pr2_pbd::StopRobotState;
 using std::string;
 using std::map;
 using rapidjson::Value;
 
 namespace pr2_pbd {
+const char* StateServer::kDb = "pr2_pbd";
+const char* StateServer::kCollection = "actions";
+
 StateServer::StateServer(const RobotStatePublisher& pub,
                          ServiceClientInterface<Find>& find)
     : pub_(pub), states_(), find_(find), tf_broadcaster_() {}
 
 bool StateServer::ServeSubscription(PublishRobotState::Request& req,
                                     PublishRobotState::Response& res) {
-  bool success = Subscribe(req.client_id, req.action_id, req.step_num);
+  ActionStepKey key(req.action_id, req.step_num);
+  bool success = Subscribe(key);
   if (!success) {
-    res.error = "Failed to subscribe client " + req.client_id +
-                " to robot state for action " + req.action_id;
+    std::stringstream ss;
+    ss << "Failed to publish robot state for action " << req.action_id
+       << " step " << req.step_num;
+    res.error = ss.str();
   } else {
-    res.tf_prefix = tf_prefix(req.client_id);
+    res.tf_prefix = tf_prefix(key);
   }
   return true;
 }
 
-bool StateServer::ServeUnsubscription(StopRobotState::Request& req,
-                                      StopRobotState::Response& res) {
-  Unsubscribe(req.client_id);
-  return true;
-}
-
-bool StateServer::Subscribe(const string& client_id, const string& action_id,
-                            int step_num) {
+bool StateServer::Subscribe(const ActionStepKey& key) {
+  if (states_.find(key) != states_.end()) {
+    return true;
+  }
   FindRequest req;
-  req.collection.db = "pr2_pbd";
-  req.collection.collection = "actions";
+  req.collection.db = kDb;
+  req.collection.collection = kCollection;
+  const string& action_id = key.first;
   req.id = action_id;
   FindResponse response;
   bool success = find_.call(req, response);
@@ -68,45 +69,35 @@ bool StateServer::Subscribe(const string& client_id, const string& action_id,
     return false;
   }
   const Value& seq = doc["sequence"]["seq"];
-  if (step_num >= static_cast<int>(seq.Size())) {
-    ROS_ERROR("Failed to parse action step: step # does not exist");
-    return false;
+  for (int step_num = 0; step_num < static_cast<int>(seq.Size()); ++step_num) {
+    const Value& step = seq[step_num];
+    ActionStepKey step_key(key.first, step_num);
+    JointStates joints;
+    if (!ParseJoints(step, &joints)) {
+      return false;
+    }
+    states_[step_key] = joints;
+    ROS_INFO("Will publish action %s, step %d", action_id.c_str(), step_num);
   }
-  const Value& step = seq[step_num];
-  JointStates joints;
-  if (!ParseJoints(step, &joints)) {
-    return false;
-  }
-  string tf_prefix = "/pr2_pbd/" + client_id;
-  ROS_INFO("Subscribed client %s to action %s, step %d", client_id.c_str(),
-           action_id.c_str(), step_num);
-  states_[client_id] = joints;
+  ROS_INFO("Publishing %ld steps total", states_.size());
 
   return true;
-}
-
-void StateServer::Unsubscribe(const string& client_id) {
-  size_t removed_count = states_.erase(client_id);
-  if (removed_count == 0) {
-    ROS_WARN("%s is already not subscribed", client_id.c_str());
-  } else {
-    ROS_INFO("Unsubscribed client %s", client_id.c_str());
-  }
 }
 
 void StateServer::Publish() {
   tf::Transform identity;
   identity.setIdentity();
-  for (std::map<string, JointStates>::const_iterator it = states_.begin();
+  for (std::map<ActionStepKey, JointStates>::const_iterator it =
+           states_.begin();
        it != states_.end(); ++it) {
-    const string& client_id = it->first;
+    const ActionStepKey& key = it->first;
     const JointStates& joints = it->second;
-    const string prefix = tf_prefix(client_id);
+    const string prefix = tf_prefix(key);
     pub_.publishFixedTransforms(prefix);
     pub_.publishTransforms(joints.joint_positions(), ros::Time::now(), prefix);
-    const string client_base_link = prefix + "/base_footprint";
+    const string step_base_link = prefix + "/base_footprint";
     tf_broadcaster_.sendTransform(tf::StampedTransform(
-        identity, ros::Time::now(), "base_footprint", client_base_link));
+        identity, ros::Time::now(), "/base_footprint", step_base_link));
   }
 }
 
@@ -162,7 +153,11 @@ bool StateServer::ParseArm(const Value& arm, const string& side_prefix,
   return true;
 }
 
-string StateServer::tf_prefix(const std::string& client_id) {
-  return "/pr2_pbd/" + client_id;
+string StateServer::tf_prefix(const ActionStepKey& key) {
+  std::stringstream ss;
+  const std::string& action_id = key.first;
+  const int step_num = key.second;
+  ss << "/pr2_pbd/" << action_id << "/" << step_num;
+  return ss.str();
 }
 }  // namespace pr2_pbd

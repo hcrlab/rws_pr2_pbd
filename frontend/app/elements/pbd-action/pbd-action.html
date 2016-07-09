@@ -85,13 +85,6 @@
       ros="{{ros}}"
       service-type="rws_pr2_pbd/PublishRobotState"
     ></ros-service>
-    <!--ros-service
-      id="stopStateService"
-      on-fail="_onStopStateError"
-      name="/unsubscribe_pbd_state"
-      ros="{{ros}}"
-      service-type="rws_pr2_pbd/StopRobotState"
-    ></ros-service-->
     <div id="container" class="layout vertical">
       <div>
       <paper-button id="backButton" on-tap="_goToList">
@@ -141,7 +134,6 @@
           type: String,
           notify: true
         },
-        clientId: String,
         globalOptions: Object,
         routeData: {
           type: Object,
@@ -155,34 +147,15 @@
       },
 
       observers: [
-        '_updateState(clientId, actionId, selectedStep)',
+        '_updateState(actionId, selectedStep)',
         '_onFindPrereqs(ros, actionId)',
-        '_clientIdChanged(globalOptions.clientId)',
       ],
-
-      ready: function() {
-        // TODO(jstn): MoveIt freaks out when you remove frames, printing out
-        // gigabytes of warnings about the frames being missing. Need to fix
-        // this somehow. For now, we never unsubscribe and assume the programs
-        // are short-lived.
-        //var that = this;
-        //window.addEventListener('unload', function() {
-        //  that.$.stopStateService.call({
-        //    client_id: that.clientId,
-        //  });
-        //});
-      },
 
       onRosConnected: function() {
       },
 
       reset: function() {
         this.selectedStep = 0;
-      },
-
-
-      _clientIdChanged: function(clientId) {
-        this.clientId = clientId;
       },
 
       _closeToast: function() {
@@ -264,16 +237,9 @@
         this.$.toast.show();
       },
 
-      _onStopStateError: function(evt) {
-        console.error(evt.detail);
-        this.$.toast.text = 'Failed to unsubscribe client from robot state.';
-        this.$.toast.show();
-      },
-
-      _updateState: function(clientId, actionId, selectedStep) {
-        if (clientId && actionId && (selectedStep === 0 || selectedStep)) {
+      _updateState: function(actionId, selectedStep) {
+        if (actionId && (selectedStep === 0 || selectedStep)) {
           this.$.startStateService.call({
-            client_id: this.clientId,
             action_id: this.actionId,
             step_num: this.selectedStep,
           });
@@ -284,7 +250,7 @@
       _update: function() {
         var config = {
           globalOptions: {
-            fixedFrame: '/pr2_pbd/' + this.clientId + '/base_link',
+            fixedFrame: '/base_footprint',
           },
           displays: [
             {
@@ -302,7 +268,7 @@
               type: 'urdf',
               options: {
                 param: 'robot_description',
-                tfPrefix: '/pr2_pbd/' + this.clientId,
+                tfPrefix: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep
               },
             },
           ],

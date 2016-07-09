@@ -30,9 +30,6 @@ int main(int argc, char** argv) {
   StateServer state_server(pub, find);
   ros::ServiceServer publish_server = nh.advertiseService(
       "/subscribe_pbd_state", &StateServer::ServeSubscription, &state_server);
-  ros::ServiceServer server =
-      nh.advertiseService("/unsubscribe_pbd_state",
-                          &StateServer::ServeUnsubscription, &state_server);
   ros::Rate rate(10);
   while (ros::ok()) {
     state_server.Publish();
