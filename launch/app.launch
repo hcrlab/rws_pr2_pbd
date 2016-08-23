@@ -2,7 +2,7 @@
   <!-- Prereqs -->
   <include file="$(find pr2_social_gaze)/launch/gaze.launch"/>
   <include file="$(find tabletop_object_detector)/launch/tabletop_segmentation.launch">
-    <arg name="tabletop_segmentation_points_in" value="$(arg kinect_camera_name)/depth_registered/points" />
+    <arg name="tabletop_segmentation_points_in" value="/head_mount_kinect/depth_registered/points" />
   </include>
   <node name="pr2_arm_control" pkg="pr2_arm_control" type="arm_control_node.py" output="screen" />
   <include file="$(find pr2_pbd_interaction)/launch/fake_caster.launch" />
@@ -19,6 +19,11 @@
     <param name="coverage" value="$(arg coverage)" />
   </node>
 
-  <!-- Robot state publisher for web clients -->
-  <node pkg="rws_pr2_pbd" type="state_server_node" name="pr2_pbd_state_server" />
+  <!--
+    State server for visualization.
+    This has been moved to the main RWS launch file. We can't allow this node to
+    be shut down, or else MoveIt! will spew out errors and destabilize the
+    robot.
+  -->
+  <!--node pkg="rws_pr2_pbd" type="state_server_node" name="pr2_pbd_state_server" /-->
 </launch>
