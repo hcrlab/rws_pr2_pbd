@@ -9,6 +9,7 @@
 <link rel="import" href="../../bower_components/paper-styles/color.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
 <link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/ros-action-client/ros-action-client.html">
 <link rel="import" href="../../bower_components/ros-service/ros-service.html">
 <link rel="import" href="../../bower_components/ros-rviz/ros-rviz.html">
 <link rel="import" href="../pbd-step/pbd-step.html">
@@ -72,19 +73,17 @@
       service-type="mongo_msg_db_msgs/Update"
     ></ros-service>
     <ros-service
-      id="executeService"
-      on-fail="_onExecuteError"
-      name="/execute_action"
-      ros="{{ros}}"
-      service-type="pr2_pbd_interaction/ExecuteActionById"
-    ></ros-service>
-    <ros-service
       id="startStateService"
       on-fail="_onStartStateError"
       name="/subscribe_pbd_state"
       ros="{{ros}}"
       service-type="rws_pr2_pbd/PublishRobotState"
     ></ros-service>
+    <ros-action-client
+      id="executeAction"
+      server="execute_pbd_action"
+      action-type="pr2_pbd_interaction/ExecuteAction"
+    ></ros-action-client>
     <div id="container" class="layout vertical">
       <div>
       <paper-button id="backButton" on-tap="_goToList">
@@ -167,10 +166,10 @@
       },
 
       _onExecute: function() {
-        var msg = {
+        var goal = {
           action_id: this.actionId,
         };
-        this.$.executeService.call(msg);
+        this.$.executeAction.send(goal);
       },
 
       _onExecuteError: function(evt) {
