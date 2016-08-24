@@ -6,7 +6,8 @@
   </include>
   <node name="pr2_arm_control" pkg="pr2_arm_control" type="arm_control_node.py" output="screen" />
   <include file="$(find pr2_pbd_interaction)/launch/fake_caster.launch" />
-  <node name="static_cloud_db" pkg="static_cloud_db" type="static_cloud_db.py" />
+  <!-- Moved to main RWS launch file. -->
+  <!--node name="static_cloud_db" pkg="static_cloud_db" type="static_cloud_db.py" /-->
 
   <!-- This runs the interaction node itself. -->
   <arg name="isReload" default="false" />
