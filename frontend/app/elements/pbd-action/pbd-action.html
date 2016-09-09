@@ -88,7 +88,7 @@
       <div>
       <paper-button id="backButton" on-tap="_goToList">
         <iron-icon icon="arrow-back"></iron-icon>
-        <span>Back to program list</span>
+        <span>Back to action list</span>
       </paper-button>
       </div>
       <div id="header" class="center layout horizontal">
@@ -104,14 +104,30 @@
           <span>Execute</span>
         </paper-button>
       </div>
-      <div class="center layout horizontal">
+      <div>
+        <p><strong>Steps:</strong> {{action.sequence.seq.length}}</p>
+        <p>
+          <strong>Landmarks:</strong>
+          <template is="dom-if" if="{{!landmarks.length}}">
+            None
+          </template>
+          <template is="dom-if" if="{{landmarks.length}}">
+            <ul>
+              <template is="dom-repeat" items="{{landmarks}}">
+                <li>{{item}}</li>
+              </template>
+            </ul>
+          </template>
+        </p>
+      </div>
+      <!--div class="center layout horizontal">
         <label>Steps:</label>
         <iron-selector id="steps" selected="{{selectedStep}}" class="center layout horizontal">
           <template is="dom-repeat" items="{{action.sequence.seq}}">
             <pbd-step index="{{index}}"></pbd-step>
           </template>
         </iron-selector>
-      </div>
+      </div-->
       <div id="viz" class="flex">
         <!--ros-rviz id="rviz" global-options="{{globalOptions}}" ros="{{ros}}"></ros-rviz-->
       </div>
@@ -134,6 +150,13 @@
           notify: true
         },
         globalOptions: Object,
+        landmarks: {
+          computed: '_computeLandmarks(action)',
+          type: Array,
+          value: function() {
+            return [];
+          },
+        },
         routeData: {
           type: Object,
           notify: true,
@@ -159,6 +182,33 @@
 
       _closeToast: function() {
         this.$.toast.close();
+      },
+
+      _computeLandmarks: function(action) {
+        var landmarks = [];
+        if (!action) {
+          return landmarks;
+        }
+        if (action.sequence.seq && action.sequence.seq.length) {
+          for (var i=0; i<action.sequence.seq.length; ++i) {
+            var step = action.sequence.seq[i];
+            if (step.type === 0) { // ActionStep.ARM_TARGET
+              var lArmState = step.armTarget.lArm;
+              var rArmState = step.armTarget.rArm;
+              if (lArmState.refFrame === 3) { // ArmState.OBJECT
+                if (landmarks.indexOf(lArmState.refFrameLandmark.name) === -1) {
+                  landmarks.push(lArmState.refFrameLandmark.name);
+                }
+              }
+              if (rArmState.refFrame === 3) { // ArmState.OBJECT
+                if (landmarks.indexOf(rArmState.refFrameLandmark.name) === -1) {
+                  landmarks.push(rArmState.refFrameLandmark.name);
+                }
+              }
+            }
+          }
+        }
+        return landmarks;
       },
 
       _goToList: function() {
