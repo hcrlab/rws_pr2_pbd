@@ -6,6 +6,8 @@
   </include>
   <node name="pr2_arm_control" pkg="pr2_arm_control" type="arm_control_node.py" output="screen" />
   <include file="$(find pr2_pbd_interaction)/launch/fake_caster.launch" />
+  <!-- Moved to main RWS launch file. -->
+  <!--node name="static_cloud_db" pkg="static_cloud_db" type="static_cloud_db.py" /-->
 
   <!-- This runs the interaction node itself. -->
   <arg name="isReload" default="false" />
@@ -17,6 +19,7 @@
     <param name="isReload" value="$(arg isReload)" />
     <param name="experimentNumber" value="$(arg experimentNumber)" />
     <param name="coverage" value="$(arg coverage)" />
+    <remap from="cloud_in" to="head_mount_kinect/depth_registered/points" />
   </node>
 
   <!--
