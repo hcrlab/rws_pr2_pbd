@@ -8,7 +8,6 @@
 <link rel="import" href="../../bower_components/paper-input/paper-input.html">
 <link rel="import" href="../../bower_components/paper-styles/color.html">
 <link rel="import" href="../../bower_components/paper-toast/paper-toast.html">
-<link rel="import" href="../../bower_components/polymer/polymer.html">
 <link rel="import" href="../../bower_components/ros-action-client/ros-action-client.html">
 <link rel="import" href="../../bower_components/ros-service/ros-service.html">
 <link rel="import" href="../../bower_components/ros-rviz/ros-rviz.html">
@@ -83,6 +82,7 @@
       id="executeAction"
       server="execute_pbd_action"
       action-type="pr2_pbd_interaction/ExecuteAction"
+      ros="{{ros}}"
     ></ros-action-client>
     <div id="container" class="layout vertical">
       <div>
