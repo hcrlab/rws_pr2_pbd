@@ -106,7 +106,6 @@
         </paper-button>
       </div>
       <div>
-        <p><strong>Steps:</strong> {{action.sequence.seq.length}}</p>
         <p>
           <strong>Landmarks:</strong>
           <template is="dom-if" if="{{!landmarks.length}}">
@@ -121,16 +120,16 @@
           </template>
         </p>
       </div>
-      <!--div class="center layout horizontal">
+      <div class="center layout horizontal">
         <label>Steps:</label>
         <iron-selector id="steps" selected="{{selectedStep}}" class="center layout horizontal">
           <template is="dom-repeat" items="{{action.sequence.seq}}">
             <pbd-step index="{{index}}"></pbd-step>
           </template>
         </iron-selector>
-      </div-->
+      </div>
       <div id="viz" class="flex">
-        <!--ros-rviz id="rviz" global-options="{{globalOptions}}" ros="{{ros}}"></ros-rviz-->
+        <ros-rviz id="rviz" global-options="{{globalOptions}}" ros="{{ros}}"></ros-rviz>
       </div>
     </div>
     <paper-toast id="toast" duration="0">
@@ -290,10 +289,10 @@
 
       _updateState: function(actionId, selectedStep) {
         if (actionId && (selectedStep === 0 || selectedStep)) {
-          //this.$.startStateService.call({
-          //  action_id: this.actionId,
-          //  step_num: this.selectedStep,
-          //});
+          this.$.startStateService.call({
+            action_id: this.actionId,
+            step_num: this.selectedStep,
+          });
           this._update();
         }
       },
@@ -315,11 +314,10 @@
               },
             }, {
               isShown: true,
-              name: 'Robot model',
-              type: 'urdf',
+              name: 'Marker array',
+              type: 'markerArray',
               options: {
-                param: 'robot_description',
-                tfPrefix: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep
+                topic: '/pr2_pbd/' + this.actionId + '/' + this.selectedStep + '/robot'
               },
             },
           ],

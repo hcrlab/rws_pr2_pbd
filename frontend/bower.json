@@ -11,7 +11,7 @@
     "paper-menu": "PolymerElements/paper-menu#4fecb43601",
     "app-route": "PolymerElements/app-route#^0.9.1",
     "ros-service": "jstnhuang/ros-service#^1.0.0",
-    "ros-rviz": "jstnhuang/ros-rviz#^0.7.0",
+    "ros-rviz": "jstnhuang/ros-rviz#^0.9.0",
     "ros-action-client": "jstnhuang/ros-action-client#^0.1.0"
   },
   "devDependencies": {
