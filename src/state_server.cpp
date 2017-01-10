@@ -6,30 +6,33 @@
 #include <utility>
 #include <vector>
 
+#include "pviz/pviz.h"
 #include "rapid_pr2/joint_states.h"
 #include "rapidjson/document.h"
-#include "robot_state_publisher/robot_state_publisher.h"
 #include "ros/ros.h"
 #include "rws_pr2_pbd/PublishRobotState.h"
+#include "visualization_msgs/MarkerArray.h"
 
 using mongo_msg_db_msgs::Find;
 using mongo_msg_db_msgs::FindRequest;
 using mongo_msg_db_msgs::FindResponse;
 using rapid::pr2::JointStates;
 using rapid_ros::ServiceClientInterface;
-using robot_state_publisher::RobotStatePublisher;
-using rws_pr2_pbd::PublishRobotState;
-using std::string;
-using std::map;
 using rapidjson::Value;
+using rws_pr2_pbd::PublishRobotState;
+using std::map;
+using std::string;
+using std::vector;
 
 namespace pr2_pbd {
 const char* StateServer::kDb = "pr2_pbd";
 const char* StateServer::kCollection = "actions";
+const double StateServer::kTorsoHeight = 0.15;
+const double StateServer::kDefaultHue = 0;
+const double StateServer::kDefaultId = 0;
 
-StateServer::StateServer(const RobotStatePublisher& pub,
-                         ServiceClientInterface<Find>& find)
-    : pub_(pub), states_(), find_(find), tf_broadcaster_() {}
+StateServer::StateServer(ServiceClientInterface<Find>& find)
+    : nh_(), states_(), find_(find), pviz_("", "/base_link") {}
 
 bool StateServer::ServeSubscription(PublishRobotState::Request& req,
                                     PublishRobotState::Response& res) {
@@ -41,13 +44,14 @@ bool StateServer::ServeSubscription(PublishRobotState::Request& req,
        << " step " << req.step_num;
     res.error = ss.str();
   } else {
-    res.tf_prefix = tf_prefix(key);
+    res.prefix = tf_prefix(key);
   }
   return true;
 }
 
 bool StateServer::Subscribe(const ActionStepKey& key) {
   if (states_.find(key) != states_.end()) {
+    Publish(key, states_[key]);
     return true;
   }
   FindRequest req;
@@ -76,28 +80,51 @@ bool StateServer::Subscribe(const ActionStepKey& key) {
     if (!ParseJoints(step, &joints)) {
       return false;
     }
-    states_[step_key] = joints;
-    ROS_INFO("Will publish action %s, step %d", action_id.c_str(), step_num);
+    ActionStepState state;
+    state.set_joint_states(joints);
+    states_[step_key] = state;
+    publishers_[step_key] = nh_.advertise<visualization_msgs::MarkerArray>(
+        tf_prefix(step_key) + "/robot", 100, true);
+    ROS_INFO("Cached action %s, step %d", action_id.c_str(), step_num);
   }
-  ROS_INFO("Publishing %ld steps total", states_.size());
+  ROS_INFO("Cached %ld steps total", states_.size());
+  Publish(key, states_[key]);
 
   return true;
 }
 
-void StateServer::Publish() {
-  tf::Transform identity;
-  identity.setIdentity();
-  for (std::map<ActionStepKey, JointStates>::const_iterator it =
-           states_.begin();
-       it != states_.end(); ++it) {
-    const ActionStepKey& key = it->first;
-    const JointStates& joints = it->second;
-    const string prefix = tf_prefix(key);
-    pub_.publishFixedTransforms(prefix);
-    pub_.publishTransforms(joints.joint_positions(), ros::Time::now(), prefix);
-    const string step_base_link = prefix + "/base_footprint";
-    tf_broadcaster_.sendTransform(tf::StampedTransform(
-        identity, ros::Time::now(), "/base_footprint", step_base_link));
+void StateServer::Publish(const ActionStepKey& key,
+                          const ActionStepState& state) {
+  ROS_INFO("Visualizing action %s, step %d", key.first.c_str(), key.second);
+  std::vector<double> r_joints(7, 0);
+  std::vector<double> l_joints(7, 0);
+  std::vector<double> base_pos(3, 0);
+  const std::map<std::string, double>& joint_positions =
+      state.joint_states().joint_positions();
+  r_joints[0] = joint_positions.at("r_shoulder_pan_joint");
+  r_joints[1] = joint_positions.at("r_shoulder_lift_joint");
+  r_joints[2] = joint_positions.at("r_upper_arm_roll_joint");
+  r_joints[3] = joint_positions.at("r_elbow_flex_joint");
+  r_joints[4] = joint_positions.at("r_forearm_roll_joint");
+  r_joints[5] = joint_positions.at("r_wrist_flex_joint");
+  r_joints[6] = joint_positions.at("r_wrist_roll_joint");
+  l_joints[0] = joint_positions.at("l_shoulder_pan_joint");
+  l_joints[1] = joint_positions.at("l_shoulder_lift_joint");
+  l_joints[2] = joint_positions.at("l_upper_arm_roll_joint");
+  l_joints[3] = joint_positions.at("l_elbow_flex_joint");
+  l_joints[4] = joint_positions.at("l_forearm_roll_joint");
+  l_joints[5] = joint_positions.at("l_wrist_flex_joint");
+  l_joints[6] = joint_positions.at("l_wrist_roll_joint");
+
+  std::vector<geometry_msgs::PoseStamped> poses;
+  if (!pviz_.computeFKforVisualizationWithKDL(r_joints, l_joints, base_pos,
+                                              kTorsoHeight, poses)) {
+    ROS_WARN("Unable to compute forward kinematics.");
+  } else {
+    visualization_msgs::MarkerArray marker_array =
+        pviz_.getRobotMeshesMarkerMsg(kDefaultHue, tf_prefix(key), kDefaultId,
+                                      poses, true);
+    publishers_[key].publish(marker_array);
   }
 }
 
@@ -157,7 +184,7 @@ string StateServer::tf_prefix(const ActionStepKey& key) {
   std::stringstream ss;
   const std::string& action_id = key.first;
   const int step_num = key.second;
-  ss << "/pr2_pbd/" << action_id << "/" << step_num;
+  ss << "pr2_pbd/" << action_id << "/" << step_num;
   return ss.str();
 }
 }  // namespace pr2_pbd

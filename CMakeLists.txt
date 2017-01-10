@@ -8,6 +8,7 @@ find_package(catkin REQUIRED COMPONENTS
   kdl_parser
   message_generation
   mongo_msg_db_msgs
+  pviz
   rapid_pr2
   rapid_ros
   robot_state_publisher
@@ -109,6 +110,7 @@ catkin_package(
     kdl_parser
     message_runtime
     mongo_msg_db_msgs
+    pviz
     rapid_pr2
     rapid_ros
     robot_state_publisher
@@ -131,14 +133,27 @@ include_directories(
 )
 link_directories(${orocos_kdl_LIBRARY_DIRS})
 
+add_library(action_step_state
+  src/action_step_state.cpp
+)
+add_dependencies(action_step_state
+  ${${PROJECT_NAME}_EXPORTED_TARGETS}
+  ${catkin_EXPORTED_TARGETS}
+)
+target_link_libraries(action_step_state
+  ${catkin_LIBRARIES}
+)
+
 add_library(state_server
   src/state_server.cpp
 )
 add_dependencies(state_server
+  action_step_state
   ${${PROJECT_NAME}_EXPORTED_TARGETS}
   ${catkin_EXPORTED_TARGETS}
 )
 target_link_libraries(state_server
+  action_step_state
   ${catkin_LIBRARIES}
 )
 

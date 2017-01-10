@@ -44,6 +44,7 @@
   <build_depend>message_generation</build_depend>
   <build_depend>mongo_msg_db_msgs</build_depend>
   <build_depend>orocos_kdl</build_depend>
+  <build_depend>pviz</build_depend>
   <build_depend>rapid_pr2</build_depend>
   <build_depend>rapid_ros</build_depend>
   <build_depend>robot_state_publisher</build_depend>
@@ -53,6 +54,7 @@
   <run_depend>message_runtime</run_depend>
   <run_depend>mongo_msg_db_msgs</run_depend>
   <run_depend>orocos_kdl</run_depend>
+  <run_depend>pviz</run_depend>
   <run_depend>rapid_pr2</run_depend>
   <run_depend>rapid_ros</run_depend>
   <run_depend>robot_state_publisher</run_depend>

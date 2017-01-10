@@ -6,13 +6,14 @@
 #include <vector>
 
 #include "mongo_msg_db_msgs/Find.h"
+#include "pviz/pviz.h"
 #include "rapid_pr2/joint_states.h"
 #include "rapid_ros/service_client.h"
 #include "rapidjson/document.h"
-#include "robot_state_publisher/robot_state_publisher.h"
 #include "ros/ros.h"
+
+#include "rws_pr2_pbd/action_step_state.h"
 #include "rws_pr2_pbd/PublishRobotState.h"
-#include "tf/transform_broadcaster.h"
 
 namespace pr2_pbd {
 
@@ -34,8 +35,7 @@ typedef std::pair<std::string, int> ActionStepKey;
 // be published under the TF prefix: /pr2_pbd/{action_id}/{step_num}
 class StateServer {
  public:
-  StateServer(const robot_state_publisher::RobotStatePublisher& pub,
-              rapid_ros::ServiceClientInterface<mongo_msg_db_msgs::Find>& find);
+  StateServer(rapid_ros::ServiceClientInterface<mongo_msg_db_msgs::Find>& find);
 
   // ROS Service handler corresponding to Subscribe below.
   bool ServeSubscription(rws_pr2_pbd::PublishRobotState::Request& req,
@@ -52,26 +52,30 @@ class StateServer {
   // Returns: true on success, false otherwise.
   bool Subscribe(const ActionStepKey& key);
 
-  // Publish robot state once. This should be called in a loop to continuously
-  // publish TFs.
-  void Publish();
-
   // The name of the MongoDB database containing the actions.
   static const char* kDb;
   // The name of the MongoDB collection containing the actions.
   static const char* kCollection;
+  // Assumed torso height (major TODO: save torso height as part of action
+  // step).
+  static const double kTorsoHeight;
+  static const double kDefaultHue;
+  static const double kDefaultId;
 
  private:
   bool ParseJoints(const rapidjson::Value& step,
                    rapid::pr2::JointStates* joints);
   bool ParseArm(const rapidjson::Value& arm, const std::string& side_prefix,
                 rapid::pr2::JointStates* joints);
+  void Publish(const ActionStepKey& key, const ActionStepState& state);
   std::string tf_prefix(const ActionStepKey& key);
-  robot_state_publisher::RobotStatePublisher pub_;
-  std::map<ActionStepKey, rapid::pr2::JointStates>
-      states_;  // Maps action IDs to robot states
+  ros::NodeHandle nh_;
+  std::map<ActionStepKey, ActionStepState>
+      states_;  // Maps action steps to robot states
+  std::map<ActionStepKey, ros::Publisher>
+      publishers_;  // Maps action steps to publishers
   rapid_ros::ServiceClientInterface<mongo_msg_db_msgs::Find>& find_;
-  tf::TransformBroadcaster tf_broadcaster_;
+  PViz pviz_;
 };
 }  // namespace pr2_pbd
 

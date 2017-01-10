@@ -17,23 +17,12 @@ int main(int argc, char** argv) {
   spinner.start();
   ros::NodeHandle nh;
 
-  // Load model
-  urdf::Model model;
-  model.initParam("robot_description");
-  KDL::Tree tree;
-  kdl_parser::treeFromUrdfModel(model, tree);
-  robot_state_publisher::RobotStatePublisher pub(tree);
-
   // Set up server
   rapid_ros::ServiceClient<Find> find(
       nh.serviceClient<Find>("mongo_msg_db/find"));
-  StateServer state_server(pub, find);
+  StateServer state_server(find);
   ros::ServiceServer publish_server = nh.advertiseService(
       "/subscribe_pbd_state", &StateServer::ServeSubscription, &state_server);
-  ros::Rate rate(10);
-  while (ros::ok()) {
-    state_server.Publish();
-    rate.sleep();
-  }
+  ros::waitForShutdown();
   return 0;
 }
