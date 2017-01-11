@@ -22,11 +22,6 @@
     <remap from="cloud_in" to="head_mount_kinect/depth_registered/points" />
   </node>
 
-  <!--
-    State server for visualization.
-    This has been moved to the main RWS launch file. We can't allow this node to
-    be shut down, or else MoveIt! will spew out errors and destabilize the
-    robot.
-  -->
-  <!--node pkg="rws_pr2_pbd" type="state_server_node" name="pr2_pbd_state_server" /-->
+  <!-- State server for visualization. -->
+  <node pkg="rws_pr2_pbd" type="state_server_node" name="rws_pr2_pbd_state_server" />
 </launch>
