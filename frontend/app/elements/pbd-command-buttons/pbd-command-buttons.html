@@ -1,0 +1,121 @@
+<link rel="import" href="../../bower_components/polymer/polymer.html">
+<link rel="import" href="../../bower_components/ros-topic/ros-topic.html">
+<link rel="import" href="../../bower_components/ros-websocket/ros-websocket.html">
+<link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<!--
+`pbd-command-buttons`
+An online version of GUI control
+
+@demo demo/index.html 
+-->
+<dom-module id="pbd-command-buttons">
+  <template>
+    <style>
+      /*
+        The style for guiReplacement
+       */
+      :host {
+        display: block;
+      }
+      paper-button {
+        color: white;
+        background-color: #3f51b5;
+        margin-bottom: 10px;
+        display: block;
+      }
+
+      h1, div {
+        border: 2px solid black;
+        border-radius: 10px;
+        box-shadow: 2px 2px black;
+      }
+
+      h1, h2 {
+        color: #3f51b5;
+        text-align: center;
+      }
+
+      div {
+        float: left;
+        margin-right: 5px;
+        width: 30%;
+      }
+
+    </style>
+    <ros-websocket auto ros="{{ros}}" on-connection=handler></ros-websocket>
+    <ros-topic
+      id="topic"
+      topic="/recognized_command"
+      ros="{{ros}}"
+      msg-type="pr2_pbd_speech_recognition/Command">
+    </ros-topic>
+    <h1>GUI Replacement for PBD Control</h1>
+    <div>
+      <h2>Robot Body Control</h2>
+      <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
+      <paper-button data="relax-left-arm" on-click=click>Relax left arm</paper-button>
+      <paper-button data="freeze-right-arm" on-click=click>Freeze right arm</paper-button>
+      <paper-button data="freeze-left-arm" on-click=click>Freeze left arm</paper-button>
+      <paper-button data="open-right-hand" on-click=click>Open right hand</paper-button>
+      <paper-button data="open-left-hand" on-click=click>Open left hand</paper-button>
+      <paper-button data="close-right-hand" on-click=click>Close right hand</paper-button>
+      <paper-button data="close-left-hand" on-click=click>Close left hand</paper-button>
+      <paper-button data="relax-head" on-click=click>Relax head</paper-button>
+      <paper-button data="freeze-head" on-click=click>Freeze head</paper-button>
+    </div>
+
+    <div>
+      <h2>Data Storage Control</h2>
+      <paper-button data="record-object-pose" on-click>Record object pose</paper-button>
+      <paper-button data="record-custom-landmark" on-click=click>Record custom landmark</paper-button>
+      <paper-button data="save-pose" on-click=click>Save pose</paper-button>
+    </div>
+
+    <div>
+      <h2>Execution and Utility</h2>
+      <paper-button data="execute-action" on-click=click>Execute action</paper-button>
+      <paper-button data="stop-execution" on-click=click>Stop execution</paper-button>
+      <paper-button data="create-new-action" on-click=click>Create new action</paper-button>
+      <paper-button data="next-action" on-click=click>Next action</paper-button>
+      <paper-button data="previous-action" on-click=click>Previous action</paper-button>
+      <paper-button data="delete-all-steps" on-click=click>Delete all steps</paper-button>
+      <paper-button data="delete-last-step" on-click=click>Delete last step</paper-button>
+      <paper-button data="start-recording-motion" on-click=click>Start recording motion</paper-button>
+      <paper-button data="stop-recording-motion" on-click=click>Stop recording motion</paper-button>
+      <paper-button data="test-microphone" on-click=click>Test microphone</paper-button>
+    </div>
+  </template>
+
+  <script>
+    /**
+     * `<pbd-command-buttons>` is meant to provide a web interface
+     * for robot control.
+     */
+    Polymer({
+
+      is: 'pbd-command-buttons',
+
+      properties: { 
+      },
+
+      /** 
+       * A function to verify connection
+       */
+      handler: function() {
+        console.log('connected!');
+      },
+
+      /** 
+       * A function for handling click event on paper-button
+       * and issue the command to the robot.
+       *
+       * @param event is an HTML on-click event
+       */
+      click: function(event) {
+        var input = event.target.getAttribute('data');
+        this.$.topic.publish({command: input});
+      },
+
+    });
+  </script>
+</dom-module>
