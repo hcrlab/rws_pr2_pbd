@@ -2,7 +2,7 @@
 <link rel="import" href="../../bower_components/ros-topic/ros-topic.html">
 <link rel="import" href="../../bower_components/ros-websocket/ros-websocket.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
-<link rel="import" href="../../bower_components/iron-collapse/iron-collapse.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
 
 <!--
 `pbd-command-buttons`
@@ -27,9 +27,7 @@ An online version of GUI control
       }
 
       h1, div {
-        border: 2px solid black;
-        border-radius: 10px;
-        box-shadow: 2px 2px black;
+        
       }
 
       h1, h2 {
@@ -37,17 +35,28 @@ An online version of GUI control
         text-align: center;
       }
 
-      iron-collapse > div {
-        background-color: white;
+      paper-dropdown-menu {
+        display: block;
+      }
+
+      paper-dropdown-menu > div {
         margin-bottom: 5%;
         margin-right: 5px;
       }
 
       div > paper-button {
-        font-size: 6pt;
+        font-size: 8pt;
         display: inline-block;
-        margin-bottom: 10px;
-        margin-botton: 10px;
+        margin-bottom: 5px;
+        /*margin-top: 10px;*/
+        vertical-align: top;
+        width: 30%;
+      }
+
+      .dropdown-div {
+        background-color: white;
+        border-bottom: 1px solid #bdbdbd;
+        padding: 5px 5px 5px 5px;
       }
 
     </style>
@@ -59,38 +68,33 @@ An online version of GUI control
       msg-type="pr2_pbd_speech_recognition/Command">
     </ros-topic>
     <paper-button on-click=collButton1>GUI Replacement for PBD Control</paper-button>
-    <iron-collapse id="coll1">
-	<div>
-	  <h2>Robot Body Control</h2>
-	  <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
-	  <paper-button data="relax-left-arm" on-click=click>Relax left arm</paper-button>
-	  <paper-button data="freeze-right-arm" on-click=click>Freeze right arm</paper-button>
-	  <paper-button data="freeze-left-arm" on-click=click>Freeze left arm</paper-button>
-	  <paper-button data="open-right-hand" on-click=click>Open right hand</paper-button>
-	  <paper-button data="open-left-hand" on-click=click>Open left hand</paper-button>
-	  <paper-button data="close-right-hand" on-click=click>Close right hand</paper-button>
-	  <paper-button data="close-left-hand" on-click=click>Close left hand</paper-button>
-	  <paper-button data="relax-head" on-click=click>Relax head</paper-button>
-	  <paper-button data="freeze-head" on-click=click>Freeze head</paper-button>
+    <paper-dropdown-menu label="GUI Replacement for PBD Control" horizontal-align="left">
+	<div class="dropdown-content">
+	  <div class="dropdown-div">
+	    <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
+	    <paper-button data="relax-left-arm" on-click=click>Relax left arm</paper-button>
+	    <paper-button data="relax-head" on-click=click>Relax head</paper-button>
+	    <paper-button data="freeze-right-arm" on-click=click>Freeze right arm</paper-button>
+	    <paper-button data="freeze-left-arm" on-click=click>Freeze left arm</paper-button>
+	    <paper-button data="freeze-head" on-click=click>Freeze head</paper-button>
+	    <paper-button data="open-right-hand" on-click=click>Open right hand</paper-button>
+	    <paper-button data="open-left-hand" on-click=click>Open left hand</paper-button>
+	    <paper-button data="close-right-hand" on-click=click>Close right hand</paper-button>
+	    <paper-button data="close-left-hand" on-click=click>Close left hand</paper-button>
+	  </div>
+	  <div class="dropdown-div">
+	    <paper-button data="record-object-pose" on-click>Record object pose</paper-button>
+	    <paper-button data="record-custom-landmark" on-click=click>Record custom landmark</paper-button>
+	    <paper-button data="save-pose" on-click=click>Save pose</paper-button>
+	  </div>
+	  <div class="dropdown-div">
+	    <paper-button data="delete-all-steps" on-click=click>Delete all steps</paper-button>
+	    <paper-button data="delete-last-step" on-click=click>Delete last step</paper-button>
+	    <paper-button data="test-microphone" on-click=click>Button Testing</paper-button>
+	  </div>
 	</div>
 
-	<div>
-	  <h2>Pose Control</h2>
-	  <paper-button data="record-object-pose" on-click>Record object pose</paper-button>
-	  <paper-button data="record-custom-landmark" on-click=click>Record custom landmark</paper-button>
-	  <paper-button data="save-pose" on-click=click>Save pose</paper-button>
-	</div>
-
-	<div>
-	  <h2>Utility</h2>
-	  <paper-button data="delete-all-steps" on-click=click>Delete all steps</paper-button>
-	  <paper-button data="delete-last-step" on-click=click>Delete last step</paper-button>
-	  <paper-button data="start-recording-motion" on-click=click>Start recording motion</paper-button>
-	  <paper-button data="stop-recording-motion" on-click=click>Stop recording motion</paper-button>
-	  <paper-button data="test-microphone" on-click=click>Test microphone</paper-button>
-	</div>
-
-    </iron-collapse>
+    </paper-dropdown-menu>
   </template>
   <script>
     /**
@@ -121,13 +125,6 @@ An online version of GUI control
         var input = event.target.getAttribute('data');
         this.$.topic.publish({command: input});
       },
-
-      /**
-       * This is the button control top layer of iron-collapse.
-       */
-      collButton1: function() {
-        this.$.coll1.toggle();
-      }
     });
   </script>
 </dom-module>
