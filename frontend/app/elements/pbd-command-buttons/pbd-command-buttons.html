@@ -59,6 +59,11 @@ An online version of GUI control
         padding: 5px 5px 5px 5px;
       }
 
+      .dropdown-content {
+        height: 325px;
+        width: 100%;
+      }
+
     </style>
     <ros-websocket auto ros="{{ros}}" on-connection=handler></ros-websocket>
     <ros-topic
@@ -67,30 +72,29 @@ An online version of GUI control
       ros="{{ros}}"
       msg-type="pr2_pbd_speech_recognition/Command">
     </ros-topic>
-    <paper-button on-click=collButton1>GUI Replacement for PBD Control</paper-button>
     <paper-dropdown-menu label="GUI Replacement for PBD Control" horizontal-align="left">
 	<div class="dropdown-content">
 	  <div class="dropdown-div">
 	    <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
-	    <paper-button data="relax-left-arm" on-click=click>Relax left arm</paper-button>
-	    <paper-button data="relax-head" on-click=click>Relax head</paper-button>
-	    <paper-button data="freeze-right-arm" on-click=click>Freeze right arm</paper-button>
-	    <paper-button data="freeze-left-arm" on-click=click>Freeze left arm</paper-button>
-	    <paper-button data="freeze-head" on-click=click>Freeze head</paper-button>
-	    <paper-button data="open-right-hand" on-click=click>Open right hand</paper-button>
-	    <paper-button data="open-left-hand" on-click=click>Open left hand</paper-button>
-	    <paper-button data="close-right-hand" on-click=click>Close right hand</paper-button>
-	    <paper-button data="close-left-hand" on-click=click>Close left hand</paper-button>
+	    <paper-button data="relax-left-arm" on-click=click raised>Relax left arm</paper-button>
+	    <paper-button data="relax-head" on-click=click raised>Relax head</paper-button>
+	    <paper-button data="freeze-right-arm" on-click=click raised>Freeze right arm</paper-button>
+	    <paper-button data="freeze-left-arm" on-click=click raised>Freeze left arm</paper-button>
+	    <paper-button data="freeze-head" on-click=click raised>Freeze head</paper-button>
+	    <paper-button data="open-right-hand" on-click=click raised>Open right hand</paper-button>
+	    <paper-button data="open-left-hand" on-click=click raised>Open left hand</paper-button>
+	    <paper-button data="close-right-hand" on-click=click raised>Close right hand</paper-button>
+	    <paper-button data="close-left-hand" on-click=click raised>Close left hand</paper-button>
 	  </div>
 	  <div class="dropdown-div">
-	    <paper-button data="record-object-pose" on-click>Record object pose</paper-button>
-	    <paper-button data="record-custom-landmark" on-click=click>Record custom landmark</paper-button>
-	    <paper-button data="save-pose" on-click=click>Save pose</paper-button>
+	    <paper-button data="record-object-pose" on-click raised>Record object pose</paper-button>
+	    <paper-button data="record-custom-landmark" on-click=click raised>Record custom landmark</paper-button>
+	    <paper-button data="save-pose" on-click=click raised>Save pose</paper-button>
 	  </div>
 	  <div class="dropdown-div">
-	    <paper-button data="delete-all-steps" on-click=click>Delete all steps</paper-button>
-	    <paper-button data="delete-last-step" on-click=click>Delete last step</paper-button>
-	    <paper-button data="test-microphone" on-click=click>Button Testing</paper-button>
+	    <paper-button data="delete-all-steps" on-click=click raised>Delete all steps</paper-button>
+	    <paper-button data="delete-last-step" on-click=click raised>Delete last step</paper-button>
+	    <paper-button data="test-microphone" on-click=click raised>Button Testing</paper-button>
 	  </div>
 	</div>
 
