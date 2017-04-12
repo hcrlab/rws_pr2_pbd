@@ -2,6 +2,8 @@
 <link rel="import" href="../../bower_components/ros-topic/ros-topic.html">
 <link rel="import" href="../../bower_components/ros-websocket/ros-websocket.html">
 <link rel="import" href="../../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
 <!--
 `pbd-command-buttons`
 An online version of GUI control
@@ -17,17 +19,20 @@ An online version of GUI control
       :host {
         display: block;
       }
-      paper-button {
+
+      .frequent {
+        background-color: darkslateblue;
         color: white;
-        background-color: #3f51b5;
-        margin-bottom: 10px;
+      }
+
+      paper-button {
+        background-color: lightskyblue;
+        color: black;
         display: block;
       }
 
       h1, div {
-        border: 2px solid black;
-        border-radius: 10px;
-        box-shadow: 2px 2px black;
+        
       }
 
       h1, h2 {
@@ -35,10 +40,32 @@ An online version of GUI control
         text-align: center;
       }
 
-      div {
-        float: left;
+      paper-dropdown-menu {
+        display: block;
+      }
+
+      paper-dropdown-menu > div {
+        margin-bottom: 5%;
         margin-right: 5px;
+      }
+
+      .dropdown-div > paper-button, .dropdown-div > div {
+        font-size: 8pt;
+        display: inline-block;
+        margin-bottom: 5px;
+        vertical-align: top;
         width: 30%;
+      }
+
+      .dropdown-div {
+        background-color: white;
+        border-bottom: 1px solid #bdbdbd;
+        padding: 5px 5px 5px 5px;
+      }
+
+      .dropdown-content {
+        height: 325px;
+        width: 100%;
       }
 
     </style>
@@ -49,43 +76,35 @@ An online version of GUI control
       ros="{{ros}}"
       msg-type="pr2_pbd_speech_recognition/Command">
     </ros-topic>
-    <h1>GUI Replacement for PBD Control</h1>
-    <div>
-      <h2>Robot Body Control</h2>
-      <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
-      <paper-button data="relax-left-arm" on-click=click>Relax left arm</paper-button>
-      <paper-button data="freeze-right-arm" on-click=click>Freeze right arm</paper-button>
-      <paper-button data="freeze-left-arm" on-click=click>Freeze left arm</paper-button>
-      <paper-button data="open-right-hand" on-click=click>Open right hand</paper-button>
-      <paper-button data="open-left-hand" on-click=click>Open left hand</paper-button>
-      <paper-button data="close-right-hand" on-click=click>Close right hand</paper-button>
-      <paper-button data="close-left-hand" on-click=click>Close left hand</paper-button>
-      <paper-button data="relax-head" on-click=click>Relax head</paper-button>
-      <paper-button data="freeze-head" on-click=click>Freeze head</paper-button>
-    </div>
+    <paper-dropdown-menu label="GUI Replacement for PBD Control" horizontal-align="left">
+	<div class="dropdown-content">
+	  <div class="dropdown-div">
+	    <paper-button data="relax-left-arm" on-click=click raised>Relax left arm</paper-button>
+	    <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
+	    <paper-button data="relax-head" on-click=click raised>Relax head</paper-button>
+	    <paper-button data="freeze-left-arm" on-click=click raised>Freeze left arm</paper-button>
+	    <paper-button data="freeze-right-arm" on-click=click raised>Freeze right arm</paper-button>
+	    <paper-button data="freeze-head" on-click=click raised>Freeze head</paper-button>
+	    <paper-button data="open-left-hand" on-click=click raised>Open left hand</paper-button>
+	    <paper-button data="open-right-hand" on-click=click raised>Open right hand</paper-button>
+	    <div></div>
+	    <paper-button data="close-left-hand" on-click=click raised>Close left hand</paper-button>
+	    <paper-button data="close-right-hand" on-click=click raised>Close right hand</paper-button>
+	  </div>
+	  <div class="dropdown-div">
+	    <paper-button data="record-object-pose" on-click=click raised>Record object pose</paper-button>
+	    <paper-button data="record-custom-landmark" on-click=click raised>Record custom landmark</paper-button>
+	    <paper-button data="save-pose" on-click=click raised class="frequent">Save pose</paper-button>
+	  </div>
+	  <div class="dropdown-div">
+	    <paper-button data="delete-all-steps" on-click=click raised>Delete all steps</paper-button>
+	    <paper-button data="delete-last-step" on-click=click raised>Delete last step</paper-button>
+	    <paper-button data="test-microphone" on-click=click raised>Button Testing</paper-button>
+	  </div>
+	</div>
 
-    <div>
-      <h2>Data Storage Control</h2>
-      <paper-button data="record-object-pose" on-click>Record object pose</paper-button>
-      <paper-button data="record-custom-landmark" on-click=click>Record custom landmark</paper-button>
-      <paper-button data="save-pose" on-click=click>Save pose</paper-button>
-    </div>
-
-    <div>
-      <h2>Execution and Utility</h2>
-      <paper-button data="execute-action" on-click=click>Execute action</paper-button>
-      <paper-button data="stop-execution" on-click=click>Stop execution</paper-button>
-      <paper-button data="create-new-action" on-click=click>Create new action</paper-button>
-      <paper-button data="next-action" on-click=click>Next action</paper-button>
-      <paper-button data="previous-action" on-click=click>Previous action</paper-button>
-      <paper-button data="delete-all-steps" on-click=click>Delete all steps</paper-button>
-      <paper-button data="delete-last-step" on-click=click>Delete last step</paper-button>
-      <paper-button data="start-recording-motion" on-click=click>Start recording motion</paper-button>
-      <paper-button data="stop-recording-motion" on-click=click>Stop recording motion</paper-button>
-      <paper-button data="test-microphone" on-click=click>Test microphone</paper-button>
-    </div>
+    </paper-dropdown-menu>
   </template>
-
   <script>
     /**
      * `<pbd-command-buttons>` is meant to provide a web interface
@@ -115,7 +134,6 @@ An online version of GUI control
         var input = event.target.getAttribute('data');
         this.$.topic.publish({command: input});
       },
-
     });
   </script>
 </dom-module>
