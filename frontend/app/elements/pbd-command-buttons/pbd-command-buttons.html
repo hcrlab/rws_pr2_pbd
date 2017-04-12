@@ -20,9 +20,14 @@ An online version of GUI control
         display: block;
       }
 
-      paper-button {
-        background-color: #3f51b5;
+      .frequent {
+        background-color: darkslateblue;
         color: white;
+      }
+
+      paper-button {
+        background-color: lightskyblue;
+        color: black;
         display: block;
       }
 
@@ -44,11 +49,10 @@ An online version of GUI control
         margin-right: 5px;
       }
 
-      div > paper-button {
+      .dropdown-div > paper-button, .dropdown-div > div {
         font-size: 8pt;
         display: inline-block;
         margin-bottom: 5px;
-        /*margin-top: 10px;*/
         vertical-align: top;
         width: 30%;
       }
@@ -75,21 +79,22 @@ An online version of GUI control
     <paper-dropdown-menu label="GUI Replacement for PBD Control" horizontal-align="left">
 	<div class="dropdown-content">
 	  <div class="dropdown-div">
-	    <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
 	    <paper-button data="relax-left-arm" on-click=click raised>Relax left arm</paper-button>
+	    <paper-button data="relax-right-arm" on-click=click raised>Relax right arm</paper-button>
 	    <paper-button data="relax-head" on-click=click raised>Relax head</paper-button>
-	    <paper-button data="freeze-right-arm" on-click=click raised>Freeze right arm</paper-button>
 	    <paper-button data="freeze-left-arm" on-click=click raised>Freeze left arm</paper-button>
+	    <paper-button data="freeze-right-arm" on-click=click raised>Freeze right arm</paper-button>
 	    <paper-button data="freeze-head" on-click=click raised>Freeze head</paper-button>
-	    <paper-button data="open-right-hand" on-click=click raised>Open right hand</paper-button>
 	    <paper-button data="open-left-hand" on-click=click raised>Open left hand</paper-button>
-	    <paper-button data="close-right-hand" on-click=click raised>Close right hand</paper-button>
+	    <paper-button data="open-right-hand" on-click=click raised>Open right hand</paper-button>
+	    <div></div>
 	    <paper-button data="close-left-hand" on-click=click raised>Close left hand</paper-button>
+	    <paper-button data="close-right-hand" on-click=click raised>Close right hand</paper-button>
 	  </div>
 	  <div class="dropdown-div">
-	    <paper-button data="record-object-pose" on-click raised>Record object pose</paper-button>
+	    <paper-button data="record-object-pose" on-click=click raised>Record object pose</paper-button>
 	    <paper-button data="record-custom-landmark" on-click=click raised>Record custom landmark</paper-button>
-	    <paper-button data="save-pose" on-click=click raised>Save pose</paper-button>
+	    <paper-button data="save-pose" on-click=click raised class="frequent">Save pose</paper-button>
 	  </div>
 	  <div class="dropdown-div">
 	    <paper-button data="delete-all-steps" on-click=click raised>Delete all steps</paper-button>
