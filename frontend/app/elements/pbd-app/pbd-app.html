@@ -4,6 +4,7 @@
 <link rel="import" href="../../bower_components/iron-pages/iron-pages.html">
 <link rel="import" href="../pbd-action/pbd-action.html">
 <link rel="import" href="../pbd-action-list/pbd-action-list.html">
+<link rel="import" href="../pbd-command-buttons/pbd-command-buttons.html">
 
 <dom-module id="pbd-app">
   <template>
@@ -21,6 +22,7 @@
     <ros-websocket id="ros" ros="{{ros}}" on-connection="_onRosConnection" on-error="_onRosError"></ros-websocket>
     <iron-pages selected="{{selectedRoute}}">
       <div>
+	<pbd-command-buttons></pbd-command-buttons>
         <pbd-action-list id="actionList" ros="{{ros}}" route-data="{{data}}"></pbd-action-list>
       </div>
       <div><pbd-action id="action" action-id="{{data.id}}" ros="{{ros}}" route-data="{{data}}"></pbd-action></div>
